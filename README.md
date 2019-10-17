@@ -1,6 +1,7 @@
 # kmodel_selector
 
 kmodel selector for M5StickV
+sample movie is here; https://youtu.be/APMaJ7DCfN8
 
 This script is a object detector it can select a kmodel from some models.
 This script doesn't woork alone, needs below:
