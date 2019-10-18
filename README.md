@@ -1,9 +1,14 @@
-# kmodel_selector
+# kmodel_selector for M5StickV
 
 kmodel selector for M5StickV
 sample movie is here; https://youtu.be/APMaJ7DCfN8
 
-This script is a object detector it can select a kmodel from some models.
+* What is M5StickV?
+M5StickV is an Edge AI Camera using K210 RiskV chip.
+https://m5stack.com/collections/all/products/stickv
+
+* What is kmodel_selector?
+This script is an object detector it can select a kmodel from some models.
 This script doesn't work alone, needs below:
   * .kmodels : It may create by V-Training site
       http://v-training.m5stack.com/
