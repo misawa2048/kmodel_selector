@@ -52,3 +52,5 @@ ad00df55d7e25a1b_mbnet10_quant,,,,,,, // 3rd line : filename of .kmodel
 kurot,akat,shirot,,,,, // 4th line : filenames of .wav file for classes in .kmodel  
 ```  
   
+![system image](https://github.com/misawa2048/kmodel_selector/blob/master/system_image.png)  
+
