@@ -10,8 +10,9 @@ M5StickV is an Edge AI Camera using K210 RiskV chip.
 https://m5stack.com/collections/all/products/stickv  
   
 *What is kmodel_selector?  
-This script is an object detector it can customize by user.
-(blind person may need help to setup, sorry)
+This script is an object detector it can customize by user  
+(blind person may need help to setup, sorry).  
+and may support any language because user must provide voice data. 
 
 This script doesn't work alone, needs below:  
   * .kmodels : It may create by V-Training site  
