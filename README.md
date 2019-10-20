@@ -1,6 +1,6 @@
 # kmodel_selector for M5StickV
 
-kmodel selector for M5StickV
+kmodel selector using M5StickV for blind person
 sample movie is here; https://youtu.be/APMaJ7DCfN8
 
 *What is M5StickV?
