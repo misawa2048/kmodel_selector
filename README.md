@@ -12,7 +12,7 @@ https://m5stack.com/collections/all/products/stickv
 *What is kmodel_selector?  
 This script is an object detector it can customize by user  
 (blind person may need help to setup, sorry).  
-and may support any language because user must provide voice data. 
+and may support any language because user may provide his own voice data. 
 
 This script doesn't work alone, needs below:  
   * .kmodels : It may create by V-Training site  
