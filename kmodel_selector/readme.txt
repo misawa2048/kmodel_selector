@@ -35,5 +35,3 @@ This script doesn't woork alone, needs below:
 c1_petbottle,,,,,,, // 2nd line : filename of .wav file for label name 
 ad00df55d7e25a1b_mbnet10_quant,,,,,,, // 3rd line : filename of .kmodel
 kurot,akat,shirot,,,,, // 4th line : filenames of .wav file for classes in .kmodel
-
-
