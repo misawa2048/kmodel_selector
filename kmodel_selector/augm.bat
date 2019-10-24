@@ -2,7 +2,7 @@
 setlocal
 
 rem Data Augmentation utility
-rem copy sopurce jpg to 30 test jpgs and 5 varid jpgs 
+rem copy sopurce jpg to 30 test jpgs and 5 valid jpgs 
 rem [ex] augm A B
 rem 
 rem ------------------
@@ -17,10 +17,10 @@ rem ./B_vt/test/B/2.jpg
 rem    :
 rem ./B_vt/test/B/30.jpg
 rem
-rem ./B_vt/varid/B/31.jpg
-rem ./B_vt/varid/B/32.jpg
+rem ./B_vt/valid/B/31.jpg
+rem ./B_vt/valid/B/32.jpg
 rem    :
-rem ./B_vt/varid/B/35.jpg
+rem ./B_vt/valid/B/35.jpg
 rem ------------------
 
 if "%1"=="" (
@@ -49,14 +49,14 @@ exit /b 0
 
 :usage
 echo ""
-echo copy sopurce jpg to 30 test jpgs and 5 varid jpgs 
+echo copy sopurce jpg to 30 test jpgs and 5 valid jpgs 
 echo Usage: augm source_file deisination_folder (.jpg only)
 echo. 
 echo [ex] augm src fol0
 echo ./src.jpg will copy to:
 echo  ./fol0_vt/test/fol0/1.jpg ... ./fol0/test/30.jpg
 echo        and
-echo  ./fol0_vt/varid/fol0/31.jpg ... ./fo35/test/30.jpg
+echo  ./fol0_vt/valid/fol0/31.jpg ... ./fo35/test/30.jpg
 echo.
 exit /b
 

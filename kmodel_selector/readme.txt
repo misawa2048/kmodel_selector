@@ -8,6 +8,11 @@ This script doesn't woork alone, needs below:
 
   * .wmv audio files, using to speak .kmodel labels and object classes.
 
+<utility>
+augm.bat
+augm.bat is an utility that an image will copy to 30 test images and 5 valid images.
+see usage of augm.bat for more information.
+
 <directry tree>
 /sd/ : top level of sd card in M5Stick V
  |-boot.py   : this script
