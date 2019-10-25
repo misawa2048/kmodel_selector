@@ -283,6 +283,8 @@ def updateKpu():
             #g_task = kpu.load("/sd/model/9d00d555d7925a1b_mbnet10_quant.kmodel")
         except:
             lcd.draw_string(0,20, "Error1: Cannot find kmodel", lcd.WHITE, lcd.RED)
+            g_cWav.play('/sd/snd/sys_ng.wav')
+            g_cWav.wait()
 
     img = sensor.snapshot()
     fmap = kpu.forward(g_task, img,False)
@@ -348,11 +350,15 @@ while(g_isLoop):
         if g_cButton.getOn(board_info.BUTTON_B):
             g_dbgCnt=0
         if g_cButton.getOn(board_info.BUTTON_A):
-            g_cWav.play('/sd/snd/sys_decide.wav')
+            g_cWav.play('/sd/snd/sys_ok.wav')
             g_cWav.wait()
             g_cButton.reset()
             g_rno=1
             resetKpu()
+            #time.sleep(1)
+            g_cWav.play('/sd/snd/sys_ok.wav')
+            g_cWav.wait()
+            #time.sleep(1)
     else:
         updateKpu()
         if g_cButton.getOn(board_info.BUTTON_A):
