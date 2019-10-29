@@ -57,5 +57,11 @@ kurot,akat,shirot,,,,, // 4th line : filenames of .wav file for classes in .kmod
 # An easier way to make wav files
 1.Record voice data including all of classes [here](https://cloud.google.com/text-to-speech/).  
 ![Google text to speech](https://raw.githubusercontent.com/misawa2048/kmodel_selector/master/google_text_to_speech.png)  
+  
 2.Trim each wav data using [WavePad音声編集ソフト](https://www.nch.com.au/wavepad/jp/index.html?kw=wav%20%E7%B7%A8%E9%9B%86&gclid=EAIaIQobChMIu6mCjbfA5QIV0QhcCh2Y9g2EEAEYASAAEgJlHPD_BwE) for free.  
 ![NCH_Wave editor free](https://raw.githubusercontent.com/misawa2048/kmodel_selector/master/NCH_wave_editor_free.png)
+  
+3.ReSample .wav data to 16bit 1CH using [EcoDecoTool](https://ja.osdn.net/projects/ecodecotool/)  
+![Eco Deco Tool Free](https://raw.githubusercontent.com/misawa2048/kmodel_selector/master/EcoDecoTool.png)  
+  
+  
