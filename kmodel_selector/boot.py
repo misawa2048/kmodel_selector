@@ -7,7 +7,8 @@ import audio
 from fpioa_manager import *
 from time import sleep
 
-SEL_DISP_NUM = 6
+SEL_DISP_NUM = 7
+SETTINGS_DIR_NAME = "-- settings --"
 #====================
 from Maix import GPIO
 class ButtonClass():
@@ -127,7 +128,22 @@ class FilerClass():
                 if (self.getIsFile(catFolderPath)==False):
                     fd = open(catFolderPath+'/label.csv','r', encoding='utf-8')
                     self.m_infoList.append(self.getCategoryInfo(catFolderPath))
+                    fd.close()
+        #append [settings] line in m_infoList
+        tmpCatInfoList = CatInfoList()
+        tmpCatInfoList.dirName = SETTINGS_DIR_NAME
+        tmpCatInfoList.wavName = "_settings"
+        tmpCatInfoList.modelName = "mSettings"
+        tmpCatInfoList.classList = []
+        self.m_infoList.append(tmpCatInfoList)
+
         return self.m_infoList
+
+    def isSelectSettings(self): # is [settings] line?
+        global g_cFiler
+        global g_selCnt
+        tmpInfoList = g_cFiler.getInfoList()
+        return True if tmpInfoList[g_selCnt].dirName == SETTINGS_DIR_NAME else False
 
     def getIsFile(self,_path):
         ret = True
@@ -203,7 +219,7 @@ def setup():
 
     g_isLoop = True;
 
-    setBacklight(3)
+    setBacklight(1)
 
 #--------------------
 def updateSelect():
@@ -224,16 +240,18 @@ def updateSelect():
         for cl in classList:
             classStr += cl+','
         lcd.draw_string(0,0, classStr, lcd.WHITE, lcd.BLACK)
-        fullPath = tmpInfoList[g_selCnt].dirName+'/'+tmpInfoList[g_selCnt].wavName
+        fullPath = 'models/' + tmpInfoList[g_selCnt].dirName+'/'+tmpInfoList[g_selCnt].wavName
         spcStr='                          '
         sttCnt = min(max(0,len(tmpInfoList)-SEL_DISP_NUM),g_selCnt)
         for i in range(min(SEL_DISP_NUM,len(tmpInfoList))):
             selCol = lcd.RED if (sttCnt+i)==g_selCnt else lcd.BLUE
             dispStr=str(sttCnt+1+i)+':'+tmpInfoList[sttCnt+i].dirName+spcStr
             lcd.draw_string(0,20+i*16,dispStr, lcd.WHITE, selCol)
-        g_cWav.play('/sd/models/'+fullPath+'.wav')
+        if(tmpInfoList[g_selCnt].dirName == SETTINGS_DIR_NAME):
+            fullPath = 'snd/sys_voicesettings'
+        g_cWav.stop()
+        g_cWav.play('/sd/'+fullPath+'.wav')
         #g_cWav.wait()
-
     g_cWav.update()
     return True
 
@@ -350,15 +368,13 @@ while(g_isLoop):
         if g_cButton.getOn(board_info.BUTTON_B):
             g_dbgCnt=0
         if g_cButton.getOn(board_info.BUTTON_A):
-            g_cWav.play('/sd/snd/sys_ok.wav')
-            g_cWav.wait()
-            g_cButton.reset()
-            g_rno=1
-            resetKpu()
-            #time.sleep(1)
-            g_cWav.play('/sd/snd/sys_ok.wav')
-            g_cWav.wait()
-            #time.sleep(1)
+            if(g_cFiler.isSelectSettings()==False):
+                g_cButton.reset()
+                g_rno=1
+                resetKpu()
+                time.sleep(0.1)
+                g_cWav.play('/sd/snd/sys_ok.wav')
+                g_cWav.wait()
     else:
         updateKpu()
         if g_cButton.getOn(board_info.BUTTON_A):
