@@ -54,3 +54,7 @@ kurot,akat,shirot,,,,, // 4th line : filenames of .wav file for classes in .kmod
   
 ![system image](https://github.com/misawa2048/kmodel_selector/blob/master/system_image.png)  
 
+# An easier way to make wav files
+
+1.Record voice data including all of classes [here](https://cloud.google.com/text-to-speech/).
+2.Trim each wav data using [WavePad音声編集ソフト](https://www.nch.com.au/wavepad/jp/index.html?kw=wav%20%E7%B7%A8%E9%9B%86&gclid=EAIaIQobChMIu6mCjbfA5QIV0QhcCh2Y9g2EEAEYASAAEgJlHPD_BwE) for free.
