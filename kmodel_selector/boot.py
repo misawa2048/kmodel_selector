@@ -124,7 +124,7 @@ class FilerClass():
         self.m_infoList = [] #[[dirStr,modelStr,wavStr,[class1,2,,,]],,]
         files = uos.listdir(_basePath)
         for filename in files:
-            if len(filename) < 20 and len(filename) > 2:
+            if len(filename) < 40:
                 catFolderPath = _basePath+'/'+filename
                 if (self.getIsFile(catFolderPath)==False):
                     fd = open(catFolderPath+'/label.csv','r', encoding='utf-8')
@@ -139,8 +139,8 @@ class FilerClass():
     def isSelectSettings(self): # is [settings] line?
         global g_cFiler
         global g_selCnt
-        tmpInfoList = g_cFiler.getInfoList()
-        return True if tmpInfoList[g_selCnt].dirName == SETTINGS_DIR_NAME else False
+        info = g_cFiler.getInfoList()[g_selCnt]
+        return True if info.dirName == SETTINGS_DIR_NAME else False
 
     def getIsFile(self,_path):
         ret = True
@@ -153,7 +153,7 @@ class FilerClass():
         return ret
 
     def getCategoryInfo(self,_labelPath):
-        tmpCatInfoList = CatInfoList(_labelPath.rsplit('/',1)[-1],'','','',[])
+        tmpCatInfoList = CatInfoList(_labelPath.rsplit('/',1)[-1],'-','-','-',[])
 
         fd = open(_labelPath+'/label.csv','r', encoding='utf-8')
         line = line2Utf8(fd.readline())
@@ -163,7 +163,7 @@ class FilerClass():
         line = line2Utf8(fd.readline())
         strList = line.split(',')
         tmpCatInfoList.modelName = strList[0]
-        tmpCatInfoList.modelType = 'vtraining' if (len(strList)<2) else strList[1]
+        tmpCatInfoList.modelType = 'vtraining' if strList[1]=='' else strList[1]
         line = line2Utf8(fd.readline())
         strList = line.split(',')
         fd.close()
@@ -232,19 +232,20 @@ def updateSelect():
 
     if(fileTestUpdate()):
         tmpInfoList = g_cFiler.getInfoList()
+        info = tmpInfoList[g_selCnt]
         classStr = ''
-        classList = tmpInfoList[g_selCnt].classList
+        classList = info.classList
         for cl in classList:
             classStr += cl+','
         lcd.draw_string(0,0, classStr, lcd.WHITE, lcd.BLACK)
-        fullPath = 'models/' + tmpInfoList[g_selCnt].dirName+'/'+tmpInfoList[g_selCnt].wavName
+        fullPath = 'models/' + info.dirName+'/'+info.wavName
         spcStr='                          '
         sttCnt = min(max(0,len(tmpInfoList)-SEL_DISP_NUM),g_selCnt)
         for i in range(min(SEL_DISP_NUM,len(tmpInfoList))):
             selCol = lcd.RED if (sttCnt+i)==g_selCnt else lcd.BLUE
             dispStr=str(sttCnt+1+i)+':'+tmpInfoList[sttCnt+i].dirName+spcStr
             lcd.draw_string(0,20+i*16,dispStr, lcd.WHITE, selCol)
-        if(tmpInfoList[g_selCnt].dirName == SETTINGS_DIR_NAME):
+        if(info.dirName == SETTINGS_DIR_NAME):
             fullPath = 'snd/sys_voicesettings'
         g_cWav.stop()
         g_cWav.play('/sd/'+fullPath+'.wav')
@@ -260,24 +261,26 @@ def resetKpu():
     global g_task
     global g_powArr
 
-    tmpInfoList = g_cFiler.getInfoList()
-    fullPath = tmpInfoList[g_selCnt].dirName+'/'+tmpInfoList[g_selCnt].modelName
+    info = g_cFiler.getInfoList()[g_selCnt]
+    fullPath = info.dirName+'/'+info.modelName
     lcd.draw_string(0,20, fullPath, lcd.GREEN, lcd.BLACK)
     fullPath = '/sd/models/'+fullPath+'.kmodel'
     g_powArr = []
-    for ii in range(len(fullPath)):
+    for ii in range(len(info.classList)):
            g_powArr.append(0.0)
 
     if(g_task==None):
         try:
             g_task = kpu.load(fullPath)
         except:
-            lcd.draw_string(0,0, "Error0: Cannot find kmodel", lcd.WHITE, lcd.RED)
+            lcd.draw_string(0,0, "Err:"+info.modelName+" not find.", lcd.WHITE, lcd.RED)
 
     sensor.reset()
     sensor.set_pixformat(sensor.RGB565)
     sensor.set_framesize(sensor.QVGA)
-    sensor.set_windowing((224, 224))
+    print(info.modelType)
+    if(info.modelType=='vtraining'):
+        sensor.set_windowing((224, 224))
     #sensor.skip_frames(time = 20000)
     sensor.run(1)
 
@@ -290,22 +293,38 @@ def updateKpu():
     global g_task
     global g_powArr
 
+    info = g_cFiler.getInfoList()[g_selCnt]
     if(g_task==None):
-        info = g_cFiler.getInfoList()[g_selCnt]
+        #info = g_cFiler.getInfoList()[g_selCnt]
         fullPath = info.dirName+'/'+info.modelName+'.kmodel'
         try:
             g_task = kpu.load('/sd/model/'+fullPath)
-            #g_task = kpu.load("/sd/model/9d00d555d7925a1b_mbnet10_quant.kmodel")
         except:
-            lcd.draw_string(0,20, "Error1: Cannot find kmodel", lcd.WHITE, lcd.RED)
+            lcd.draw_string(0,20, "Err:"+info.modelName+" not find.", lcd.WHITE, lcd.RED)
             g_cWav.play('/sd/snd/sys_ng.wav')
             g_cWav.wait()
+        if(info.modelType=='yolo2'):
+            anchor = (1.889, 2.5245, 2.9465, 3.94056, 3.99987, 5.3658, 5.155437, 6.92275, 6.718375, 9.01025)
+            # Anchor data is for bbox, extracted from the training sets.
+            kpu.init_yolo2(g_task, 0.5, 0.3, 5, anchor)
 
     img = sensor.snapshot()
-    fmap = kpu.forward(g_task, img,False)
-    plist=fmap[:]
-    pmax=max(plist)
-    max_index=plist.index(pmax)
+
+    if(info.modelType=='yolo2'):
+        code_obj = kpu.run_yolo2(g_task, img)
+        if code_obj: # object detected
+            plist=[1,2,3]
+            pmax=0
+            max_index=0
+        else:
+            plist=[1,2,3]
+            pmax=0
+            max_index=0
+    else:
+        fmap = kpu.forward(g_task, img,False)
+        plist=fmap[:]
+        pmax=max(plist)
+        max_index=plist.index(pmax)
 
     colArr = [(255,0,0),(0,255,0),(0,0,255),(5,5,5),(0,255,255),(255,255,0),(128,128,128),(50,200,50)]
     for id in range(0, len(plist)):
@@ -366,14 +385,12 @@ while(g_isLoop):
             g_dbgCnt=0
         if g_cButton.getOn(board_info.BUTTON_A):
             if(g_cFiler.isSelectSettings()==False):
-                tmpInfoList = g_cFiler.getInfoList()
-                if(tmpInfoList[g_selCnt].modelType=='vtraining'):
-                    g_cButton.reset()
-                    g_rno=1
-                    resetKpu()
-                    time.sleep(0.1)
-                    g_cWav.play('/sd/snd/sys_ok.wav')
-                    g_cWav.wait()
+                g_cButton.reset()
+                g_rno=1
+                resetKpu()
+                time.sleep(0.1)
+                g_cWav.play('/sd/snd/sys_ok.wav')
+                g_cWav.wait()
     else:
         updateKpu()
         if g_cButton.getOn(board_info.BUTTON_A):
