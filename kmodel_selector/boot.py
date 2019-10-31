@@ -323,17 +323,22 @@ def updateKpu():
     img = sensor.snapshot()
 
     if(info.modelType=='yolo2'):
+        plist=[]
+        for id in range(0, len(info.classList)):
+            plist.append(0.0)
+
         code_obj = kpu.run_yolo2(g_task, img)
         if code_obj: # object detected
-            plist=[0,0,0]
-            pmax=0
-        else:
-            plist=[0,0,0]
-            pmax=0
+            for i in code_obj:
+                rect_size = i.w() * i.h()
+                if rect_size > 10:
+                    print(len(plist))
+                    print(i.classid())
+                    plist[i.classid()]=0.95
+
     else:
         fmap = kpu.forward(g_task, img,False)
         plist=fmap[:]
-        pmax=max(plist)
 
     colArr = [(255,0,0),(0,255,0),(0,0,255),(5,5,5),(0,255,255),(255,255,0),(128,128,128),(50,200,50)]
     for id in range(0, len(plist)):
