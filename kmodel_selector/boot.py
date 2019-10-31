@@ -255,6 +255,28 @@ def updateSelect():
 
 #--------------------
 import KPU as kpu
+def _resetTask():
+    global g_selCnt
+    global g_cFiler
+    global g_task
+
+    info = g_cFiler.getInfoList()[g_selCnt]
+    fullPath = info.dirName+'/'+info.modelName
+    fullPath = '/sd/models/'+fullPath+'.kmodel'
+    try:
+        g_task = kpu.load(fullPath)
+        if(info.modelType=='yolo2'):
+            anchor = (1.889, 2.5245, 2.9465, 3.94056, 3.99987, 5.3658, 5.155437, 6.92275, 6.718375, 9.01025)
+            # Anchor data is for bbox, extracted from the training sets.
+            kpu.init_yolo2(g_task, 0.5, 0.3, 5, anchor)
+    except:
+        lcd.draw_string(0,20, "Err:"+info.modelName+" not find.", lcd.WHITE, lcd.RED)
+        g_task = None
+
+    return g_task
+
+#--------------------
+import KPU as kpu
 def resetKpu():
     global g_selCnt
     global g_cFiler
@@ -270,10 +292,7 @@ def resetKpu():
            g_powArr.append(0.0)
 
     if(g_task==None):
-        try:
-            g_task = kpu.load(fullPath)
-        except:
-            lcd.draw_string(0,0, "Err:"+info.modelName+" not find.", lcd.WHITE, lcd.RED)
+        g_task=_resetTask()
 
     sensor.reset()
     sensor.set_pixformat(sensor.RGB565)
@@ -294,37 +313,27 @@ def updateKpu():
     global g_powArr
 
     info = g_cFiler.getInfoList()[g_selCnt]
+
     if(g_task==None):
-        #info = g_cFiler.getInfoList()[g_selCnt]
-        fullPath = info.dirName+'/'+info.modelName+'.kmodel'
-        try:
-            g_task = kpu.load('/sd/model/'+fullPath)
-        except:
-            lcd.draw_string(0,20, "Err:"+info.modelName+" not find.", lcd.WHITE, lcd.RED)
-            g_cWav.play('/sd/snd/sys_ng.wav')
-            g_cWav.wait()
-        if(info.modelType=='yolo2'):
-            anchor = (1.889, 2.5245, 2.9465, 3.94056, 3.99987, 5.3658, 5.155437, 6.92275, 6.718375, 9.01025)
-            # Anchor data is for bbox, extracted from the training sets.
-            kpu.init_yolo2(g_task, 0.5, 0.3, 5, anchor)
+        g_task=_resetTask()
+    if(g_task==None):
+        g_cWav.play('/sd/snd/sys_ng.wav')
+        g_cWav.wait()
 
     img = sensor.snapshot()
 
     if(info.modelType=='yolo2'):
         code_obj = kpu.run_yolo2(g_task, img)
         if code_obj: # object detected
-            plist=[1,2,3]
+            plist=[0,0,0]
             pmax=0
-            max_index=0
         else:
-            plist=[1,2,3]
+            plist=[0,0,0]
             pmax=0
-            max_index=0
     else:
         fmap = kpu.forward(g_task, img,False)
         plist=fmap[:]
         pmax=max(plist)
-        max_index=plist.index(pmax)
 
     colArr = [(255,0,0),(0,255,0),(0,0,255),(5,5,5),(0,255,255),(255,255,0),(128,128,128),(50,200,50)]
     for id in range(0, len(plist)):
