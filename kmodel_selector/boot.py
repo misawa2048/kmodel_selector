@@ -105,11 +105,12 @@ class WavClass():
 
 #====================
 class CatInfoList():
-    def __init__(self):
-        self.dirName = ''
-        self.modelName = ''
-        self.wavName = ''
-        self.classList = []
+    def __init__(self,_dirName,_modelName,_modelType,_wavName,_classList):
+        self.dirName = _dirName
+        self.modelName = _modelName
+        self.modelType = _modelType
+        self.wavName = _wavName
+        self.classList = _classList
 
 #====================
 import uos
@@ -130,11 +131,7 @@ class FilerClass():
                     self.m_infoList.append(self.getCategoryInfo(catFolderPath))
                     fd.close()
         #append [settings] line in m_infoList
-        tmpCatInfoList = CatInfoList()
-        tmpCatInfoList.dirName = SETTINGS_DIR_NAME
-        tmpCatInfoList.wavName = "_settings"
-        tmpCatInfoList.modelName = "mSettings"
-        tmpCatInfoList.classList = []
+        tmpCatInfoList = CatInfoList(SETTINGS_DIR_NAME,"_settings","notmodel","mSettings",[])
         self.m_infoList.append(tmpCatInfoList)
 
         return self.m_infoList
@@ -156,8 +153,7 @@ class FilerClass():
         return ret
 
     def getCategoryInfo(self,_labelPath):
-        tmpCatInfoList = CatInfoList()
-        tmpCatInfoList.dirName = _labelPath.rsplit('/',1)[-1]
+        tmpCatInfoList = CatInfoList(_labelPath.rsplit('/',1)[-1],'','','',[])
 
         fd = open(_labelPath+'/label.csv','r', encoding='utf-8')
         line = line2Utf8(fd.readline())
@@ -167,6 +163,7 @@ class FilerClass():
         line = line2Utf8(fd.readline())
         strList = line.split(',')
         tmpCatInfoList.modelName = strList[0]
+        tmpCatInfoList.modelType = 'vtraining' if (len(strList)<2) else strList[1]
         line = line2Utf8(fd.readline())
         strList = line.split(',')
         fd.close()
@@ -369,12 +366,14 @@ while(g_isLoop):
             g_dbgCnt=0
         if g_cButton.getOn(board_info.BUTTON_A):
             if(g_cFiler.isSelectSettings()==False):
-                g_cButton.reset()
-                g_rno=1
-                resetKpu()
-                time.sleep(0.1)
-                g_cWav.play('/sd/snd/sys_ok.wav')
-                g_cWav.wait()
+                tmpInfoList = g_cFiler.getInfoList()
+                if(tmpInfoList[g_selCnt].modelType=='vtraining'):
+                    g_cButton.reset()
+                    g_rno=1
+                    resetKpu()
+                    time.sleep(0.1)
+                    g_cWav.play('/sd/snd/sys_ok.wav')
+                    g_cWav.wait()
     else:
         updateKpu()
         if g_cButton.getOn(board_info.BUTTON_A):
