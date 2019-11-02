@@ -48,7 +48,7 @@ This script doesn't work alone, needs below:
 [label.csv]  
 //,,,,,,, // 1st line : no use(for comment)  
 c1_petbottle,,,,,,, // 2nd line : filename of .wav file for label name   
-ad00df55d7e25a1b_mbnet10_quant,,,,,,, // 3rd line : filename of .kmodel  
+ad00df55d7e25a1b_mbnet10_quant,vtraining,,,,,, // 3rd line : filename of .kmodel, model type(vtraining|yolo2)  
 kurot,akat,shirot,,,,, // 4th line : filenames of .wav file for classes in .kmodel  
 ```  
   
